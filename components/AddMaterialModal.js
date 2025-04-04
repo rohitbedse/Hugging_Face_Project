@@ -37,6 +37,11 @@ const AddMaterialModal = ({
   // Sample materials for the library
   const sampleMaterials = [
     {
+      name: 'Aquatic Eggs',
+      image: '/samples/aquaticeggs.png',
+      prompt: "Transform this sketch into a chrome material. Render it in a high-end 3D visualization style with professional studio lighting against a pure black background. Make it look like an elegant Cinema 4D and Octane rendering with detailed material properties and characteristics. The final result should be an elegant visualization with perfect studio lighting, crisp shadows, and high-end material definition. Specifically, the chrome material should exhibit a highly reflective surface with a subtle specular highlight, creating a mirror-like appearance. The material's surface should possess a subtle sheen, achieved through a thin-film interference effect in the Octane Glossy material, adding a rainbow iridescence that shifts with the viewing angle."
+    },
+    {
       name: 'Topographic',
       image: '/samples/topographic.jpeg',
       prompt: "Transform this sketch into a sculptural form composed of precisely stacked, thin metallic rings or layers. Render it with warm copper/bronze tones with each layer maintaining equal spacing from adjacent layers, creating a topographic map effect. The form should appear to flow and undulate while maintaining the precise parallel structure. Use dramatic studio lighting against a pure black background to highlight the metallic luster and dimensional quality. Render it in a high-end 3D visualization style with perfect definition between each ring layer."
@@ -47,24 +52,64 @@ const AddMaterialModal = ({
       prompt: "Transform this sketch into a boobly material. Render it in a high-end 3D visualization style with professional studio lighting against a pure black background. Make it look like an elegant Cinema 4D and Octane rendering with detailed material properties and characteristics. The final result should be an elegant visualization with perfect studio lighting, crisp shadows, and high-end material definition. Specifically, the boobly material should exhibit noticeable internal light scattering and a high degree of dynamic deformation on impact. To achieve the boobly effect, use a combination of Octane's Subsurface Scattering (SSS) and a Dynamic Mesh simulation in Cinema 4D, feeding the displacement output into the Octane material via an Octane Displacement node. The SSS should be tuned for a soft, fleshy translucency with a slight color shift towards red in thinner areas. Implement a high-frequency, low-amplitude noise pattern within the SSS radius to simulate subcutaneous textures. The material's surface should possess a subtle sheen, achieved through a thin-film interference effect in the Octane Glossy material, adding a rainbow iridescence that shifts with the viewing angle. The Dynamic Mesh should simulate realistic jiggle physics; consider using Cinema 4D's Soft Body Dynamics with carefully tuned spring and dampening values. Optimize the Octane scene for render efficiency, focusing on minimizing noise in the SSS and glossy reflections with adequate sample counts and kernel settings. The boobly material possesses a unique combination of squishiness and internal illumination, resulting in a captivating visual texture reminiscent of soft, organic forms. Rendering requires careful balancing of SSS settings and dynamic mesh calculations to achieve a realistic and visually appealing final result."
     },
     {
-      name: 'Gold',
-      image: '/samples/gold.png',
-      prompt: "Transform this sketch into a sculptural form composed of precisely stacked, thin metallic rings or layers. Render it with warm copper/bronze tones with each layer maintaining equal spacing from adjacent layers, creating a topographic map effect. The form should appear to flow and undulate while maintaining the precise parallel structure. Use dramatic studio lighting against a pure black background to highlight the metallic luster and dimensional quality. Render it in a high-end 3D visualization style with perfect definition between each ring layer."
-    },
-    {
       name: 'Chinese Porcelain',
       image: '/samples/porcelain.png',
       prompt: "Transform this sketch into a ceramic vase featuring traditional blue and white Chinese porcelain designs, including dragons and cloud motifs. Pay close attention to the subtle variations in the blue pigment, creating a hand-painted effect with soft edges and intricate details. The vase should have a slightly glossy surface with gentle reflections. Render in Cinema 4D with Octane, using professional studio lighting to showcase the form and texture against a pure black background. Simulate subtle imperfections and surface irregularities typical of hand-crafted porcelain."
     },
     {
-      name: 'Voxels',
-      image: '/samples/voxels.png',
-      prompt: "Transform this sketch into a physical manifestation of 8-bit voxel art. The rendering should capture the distinct, blocky nature of the medium, with each 'voxel' clearly defined and possessing a matte, slightly rough surface texture. Render the object as if constructed from these individual, quantized blocks, highlighting the stepped edges and discrete color transitions inherent to the 8-bit aesthetic. The professional studio lighting should emphasize the geometric forms and reveal subtle variations in tone across the voxel surfaces. Use Cinema 4D and Octane to create a high-resolution visualization that showcases the material's unique properties against a pure black background, ensuring crisp shadows and a clear definition of each individual voxel. The final result should be an elegant visualization that celebrates the charm and simplicity of 8-bit graphics in a physical form."
+      name: 'Dragonscale',
+      image: '/samples/dragonscale.png',
+      prompt: "Transform this sketch into a form that appears to be constructed from incredibly detailed and overlapping dragonscales. The scales should exhibit a subtle iridescence, catching and reflecting light in a way that mimics natural mineral refraction. Each scale should have a slightly raised texture and a subtle specular highlight. Render the piece in Cinema 4D and Octane, paying close attention to the intricacies of the scale pattern and the way light interacts with the textured surface against a pure black background. The final result should be a highly detailed, elegant visualization that showcases the complex material properties of dragonscales under professional studio lighting with crisp, well-defined shadows."
     },
     {
-      name: 'Studio Ghibli',
-      image: '/samples/ghibli.png',
-      prompt: "Render the specific subject/scene/character detailed in the provided drawing/text. Faithfully interpret the core elements, composition, and figures present in the input. THEN, apply the following Studio Ghibli stylistic treatment: Aesthetic: Convert the rendering into the characteristic hand-painted look of Studio Ghibli films. Backgrounds: Use lush, painterly backgrounds that complement the subject (if the input lacks a background, create one in the Ghibli style; if it has one, render that background in the Ghibli style). Linework: Employ soft, expressive linework, avoiding harsh digital lines. Color: Utilize a warm, evocative, and harmonious color palette. Atmosphere: Infuse the scene with a Ghibli sense of wonder, nostalgia, or gentle melancholy, appropriate to the subject matter drawn. Details: Add subtle environmental details like wind, detailed foliage, or atmospheric effects typical of Ghibli, where suitable for the depicted scene. Lighting: Implement soft, natural, and atmospheric lighting (dappled sunlight, golden hour, overcast) integrated into the painted style. Goal: The final image must look like a high-quality Ghibli keyframe or background plate that is a clear and recognizable interpretation of the original provided drawing/text, not a generic Ghibli scene."
+      name: 'Ernst Haeckel',
+      image: '/samples/ernsthaeckel.png',
+      prompt: "Transform this sketch into a collection of various deep-sea organisms with intricate patterns and textures, reminiscent of Ernst Haeckel's illustrations. Each organism should exhibit unique color palettes, ranging from vibrant yellows and oranges to deep blues and greens. The surfaces should convey a sense of organic texture, with subtle variations in glossiness and detailed surface imperfections. Render in Cinema 4D with Octane, using professional studio lighting to capture the delicate details and vibrant colors against a pure black background, enhancing the contrast and highlighting the bioluminescent qualities of the forms."
+    },
+    {
+      name: 'Emoji',
+      image: '/samples/emojiface.png',
+      prompt: "Recreate this sketch as a smooth, stylized human face emoji. The skin should have a subtle subsurface scattering effect to give it a soft, slightly translucent quality. The hair should be a matte with very subtle highlights to give it form. Render in Cinema 4D with Octane, using soft, diffused studio lighting to emphasize the smooth surfaces and subtle color variations. Maintain a pure black background."
+    },
+    {
+      name: 'Fruit',
+      image: '/samples/fruit.png',
+      prompt: "Transform this sketch into a photorealistic 3D rendering of various fruits, including a lemon, orange, grapes, and walnuts. Pay close attention to the textures; the lemon and orange should have a bumpy, porous surface with subtle variations in color. The grapes should exhibit a smooth, slightly translucent skin. The walnuts should have a detailed, rough texture with realistic cracks and crevices. Use professional studio lighting against a pure black background to create strong contrasts and highlight the details of each fruit. Render in Cinema 4D with Octane, focusing on accurate subsurface scattering for the grapes and realistic light interaction with the textured surfaces of the lemon, orange, and walnuts."
+    },
+    {
+      name: 'Gold',
+      image: '/samples/gold.png',
+      prompt: "Transform this sketch into a sculptural form composed of precisely stacked, thin metallic rings or layers. Render it with warm copper/bronze tones with each layer maintaining equal spacing from adjacent layers, creating a topographic map effect. The form should appear to flow and undulate while maintaining the precise parallel structure. Use dramatic studio lighting against a pure black background to highlight the metallic luster and dimensional quality. Render it in a high-end 3D visualization style with perfect definition between each ring layer."
+    },
+    {
+      name: 'Stained Glass',
+      image: '/samples/stainedglass.png',
+      prompt: "Transform this sketch into a detailed 3D model of a stained glass. Each segment of glass should have a unique, vibrant color and subtle internal texture, simulating the natural imperfections of stained glass. The metal frame should have a brushed finish with slight imperfections and subtle reflections. Render in Cinema 4D with Octane, using professional studio lighting to enhance the transparency and color variations of the glass, and the metallic sheen of the frame, against a pure black background."
+    },
+    {
+      name: 'Holographic Foil',
+      image: '/samples/holographicfoil.png',
+      prompt: "Transform this sketch into a physical form rendered entirely in holographic foil material. Capture the iridescent, shifting colors and light diffraction effects characteristic of holographic foil, as light plays across its surface. Render the material's unique texture and reflective properties in a high-end 3D visualization using Cinema 4D and Octane. The professional studio lighting should enhance the holographic effect, creating crisp reflections and vibrant color gradients against the pure black background. The final result should be an elegant visualization with perfect studio lighting, highlighting the detailed material properties and characteristics of holographic foil."
+    },
+    {
+      name: 'Liquid Mercury',
+      image: '/samples/liquidmercury.png',
+      prompt: "Transform this sketch into a form that appears to be composed entirely of liquid mercury. Render it in a high-end 3D visualization style with professional studio lighting that reflects and refracts through the metallic liquid surface against a pure black background. The Cinema 4D and Octane rendering should showcase the unique specular highlights, smooth, flowing forms, and highly reflective nature of mercury. Pay close attention to the way light interacts with the curved surfaces, creating realistic caustics and distortions. The final result should be an elegant visualization with perfect studio lighting, crisp reflections, and detailed material definition, capturing the essence of liquid mercury."
+    },
+    {
+      name: 'Mushrooms',
+      image: '/samples/mushrooms.png',
+      prompt: "Transform this sketch into a material that embodies the essence of mushrooms. Render it in a high-end 3D visualization style with professional studio lighting against a pure black background. Make it look like an elegant Cinema 4D and Octane rendering, emphasizing the organic textures, subtle translucency, and earthy tones of various mushroom species. Focus on the interplay of light and shadow across the cap's surface, capturing the unique patterns and textures, from smooth and glossy to dry and porous. The final result should be an elegant visualization with perfect studio lighting, crisp shadows, and high-end material definition, showcasing the delicate beauty and natural complexity of mushrooms."
+    },
+     {
+      name: 'Octopus',
+      image: '/samples/octopus.png',
+      prompt: "Transform this sketch into a physical octopus tentacle material. Render it in a high-end 3D visualization style with professional studio lighting against a pure black background. Make it look like an elegant Cinema 4D and Octane rendering with detailed material properties and characteristics, focusing on the tentacle's unique texture, including suckers, and subtle translucency. Highlight the interplay of light and shadow on the wet, slightly slimy surface, capturing the organic feel. The final result should be an elegant visualization with perfect studio lighting, crisp shadows, and high-end material definition emphasizing the octopus tentacle's natural details."
+    },
+    {
+      name: 'Plant',
+      image: '/samples/plant.png',
+      prompt: "Transform this sketch into a plant with soft green leaves, featuring a subtle, fine dusting on the surface, resembling a delicate bloom. The leaves should have a slightly translucent quality, allowing light to subtly scatter through them. Render in Cinema 4D with Octane, using professional studio lighting to create dramatic shadows and highlights against a pure black background, emphasizing the texture and form of the plant. Use subsurface scattering to simulate the light passing through the leaves."
     },
     {
       name: 'Purple Fur',
@@ -72,14 +117,39 @@ const AddMaterialModal = ({
       prompt: "Transform this sketch into a 3D model with a stylized fur material, featuring long, soft, vibrant purple strands with subtle dark grey roots. Pay close attention to the direction and clumping of the fur to mimic the animal form's texture. Render it in Cinema 4D with Octane, using professional studio lighting against a pure black background to accentuate the texture and color depth of the fur, creating soft shadows and highlights."
     },
     {
+      name: 'Pink Velvet',
+      image: '/samples/pinkvelvet.png',
+      prompt: "Transform this sketch into a 3D rendering of soft, velvety, textured forms arranged in a composition. The forms should have a plush, almost granular surface texture, reminiscent of velvet flocking. Utilize subtle variations in pink and red hues across the forms. Render in Cinema 4D with Octane, using soft, diffused studio lighting to accentuate the depth and texture of the flocked material, set against a pure black background to create dramatic contrast and isolate the arrangement."
+    },
+    {
+      name: 'Voxels',
+      image: '/samples/voxels.png',
+      prompt: "Transform this sketch into a physical manifestation of 8-bit voxel art. The rendering should capture the distinct, blocky nature of the medium, with each 'voxel' clearly defined and possessing a matte, slightly rough surface texture. Render the object as if constructed from these individual, quantized blocks, highlighting the stepped edges and discrete color transitions inherent to the 8-bit aesthetic. The professional studio lighting should emphasize the geometric forms and reveal subtle variations in tone across the voxel surfaces. Use Cinema 4D and Octane to create a high-resolution visualization that showcases the material's unique properties against a pure black background, ensuring crisp shadows and a clear definition of each individual voxel. The final result should be an elegant visualization that celebrates the charm and simplicity of 8-bit graphics in a physical form."
+    },
+    {
       name: 'Water',
       image: '/samples/water.png',
       prompt: "Transform this sketch into a dynamic water sculpture. Render it in a high-end 3D visualization style with professional studio lighting against a pure black background. Make it look like an elegant Cinema 4D and Octane rendering with detailed material properties and characteristics, capturing the essence of flowing water. The final result should be an elegant visualization with perfect studio lighting, crisp shadows, and high-end material definition, showcasing the water's transparency, refractive index, and subtle surface ripples. Emphasize the interplay of light and shadow as it passes through the water, highlighting its fluid and dynamic nature."
     },
     {
+      name: 'Studio Ghibli',
+      image: '/samples/ghibli.png',
+      prompt: "Render the specific subject/scene/character detailed in the provided drawing/text. Faithfully interpret the core elements, composition, and figures present in the input. THEN, apply the following Studio Ghibli stylistic treatment: Aesthetic: Convert the rendering into the characteristic hand-painted look of Studio Ghibli films. Backgrounds: Use lush, painterly backgrounds that complement the subject (if the input lacks a background, create one in the Ghibli style; if it has one, render that background in the Ghibli style). Linework: Employ soft, expressive linework, avoiding harsh digital lines. Color: Utilize a warm, evocative, and harmonious color palette. Atmosphere: Infuse the scene with a Ghibli sense of wonder, nostalgia, or gentle melancholy, appropriate to the subject matter drawn. Details: Add subtle environmental details like wind, detailed foliage, or atmospheric effects typical of Ghibli, where suitable for the depicted scene. Lighting: Implement soft, natural, and atmospheric lighting (dappled sunlight, golden hour, overcast) integrated into the painted style. Goal: The final image must look like a high-quality Ghibli keyframe or background plate that is a clear and recognizable interpretation of the original provided drawing/text, not a generic Ghibli scene."
+    },
+    {
+      name: 'Skin',
+      image: '/samples/skin.png',
+      prompt: "Transform this sketch into a realistic skin material. Pay close attention to the subtle variations in skin tone and the way light reflects off the surface. The skin should appear hydrated and healthy with fine pores and natural imperfections. Use subsurface scattering to simulate the way light penetrates the skin. Render it in Cinema 4D with Octane, using professional studio lighting against a pure black background to enhance the specular highlights and create a contrast between the skin and the background."
+    },
+    {
       name: 'Shrek',
       image: '/samples/shrek.png',
       prompt: "Transform this sketch into a Shrek-like material, capturing the essence of his green, slightly bumpy skin texture. Render it in a high-end 3D visualization style with professional studio lighting against a pure black background. Emphasize the subtle variations in skin tone, the slight translucency that allows for subsurface scattering, and the almost mossy, organic feel. Make it look like an elegant Cinema 4D and Octane rendering with detailed material properties and characteristics, highlighting the way light interacts with the unique surface. The final result should be an elegant visualization with perfect studio lighting, crisp shadows, and high-end material definition, showcasing the Shrek-like skin properties."
+    },
+    {
+      name: 'Temple Patterns',
+      image: '/samples/templepatterns.png',
+      prompt: "Transform this sketch into a physical form exhibiting the intricate patterns and textures found on Hindu temples. Render it in a high-end 3D visualization style with professional studio lighting against a pure black background. The material should emulate the characteristic stone carvings, detailed reliefs, and geometric designs typical of Hindu temple architecture. Use Cinema 4D and Octane to create an elegant rendering that captures the depth and complexity of the pattern, including subtle variations in texture and tone. Focus on precise replication of the surface details, creating the illusion of aged stone and carved motifs. The final result should be an elegant visualization with perfect studio lighting, crisp shadows that accentuate the pattern, and high-end material definition that showcases the essence of Hindu temple design."
     },
   ];
 
