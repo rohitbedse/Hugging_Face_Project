@@ -14,6 +14,8 @@ short_description: 'Gemini native image for 3D co-drawing'
 
 A collaborative drawing application powered by Google's Gemini 2.0 API for image generation. This app allows users to create drawings and have Gemini enhance or add to them based on text prompts.
 
+This ONLY uses the base Gemini API to generate.
+
 ## API Key Setup
 
 To use this application, you'll need a Google AI Studio API key:
