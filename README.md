@@ -18,7 +18,7 @@ A collaborative drawing application powered by Google's Gemini 2.0 API for image
 
 To use this application, you'll need a Google AI Studio API key:
 
-1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey) (https://ai.dev)
 2. Create a new API key or use an existing one
 3. Put your API key in a `.env` file. 
 
