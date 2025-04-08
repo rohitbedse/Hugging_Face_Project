@@ -30,6 +30,29 @@ GEMINI_API_KEY={your_key}
 
 The free tier includes generous usage limits, but you can also upgrade for additional capacity.
 
+## Developer Features
+
+### Debug Mode
+
+For development and testing purposes, the application includes a debug mode to help troubleshoot API quota issues:
+
+- **Enabling Debug Mode** (OFF by default): 
+  - Add `?debug=true` to the URL
+  - Or toggle the debug button in the error modal (development environment only)
+  - Or set `debugMode=true` in localStorage
+
+- **Disabling Debug Mode**:
+  - Add `?debug=false` to the URL to override any localStorage setting
+  - Toggle the debug button to OFF in the error modal
+  - Clearing browser data for the site will also reset it to OFF
+
+- **Features**:
+  - Automatically displays the API quota error modal for testing
+  - Debug status is persisted in localStorage between sessions
+  - Visible debug toggle in the error modal
+
+This mode is only fully available in development environments (`NODE_ENV === 'development'`).
+
 ## Technology Stack
 
 This is a [Next.js](https://nextjs.org) project that uses:

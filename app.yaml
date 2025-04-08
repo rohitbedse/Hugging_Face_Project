@@ -1,0 +1,12 @@
+service: gemini-3d-draw
+env: standard
+runtime: nodejs20
+
+handlers:
+  - url: /.*
+    secure: always
+    script: auto
+
+env_variables:
+  GEMINI_API_KEY: "AIzaSyByp1JkqBFAibEQUrpkoSyAscDQX158t2M"
+  GCP_CLIENT_EMAIL: "trudyp@google.com"
