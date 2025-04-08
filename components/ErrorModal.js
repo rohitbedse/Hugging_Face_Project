@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X, Bug } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 const ErrorModal = ({ 
@@ -6,7 +6,10 @@ const ErrorModal = ({
   closeErrorModal, 
   customApiKey, 
   setCustomApiKey, 
-  handleApiKeySubmit 
+  handleApiKeySubmit,
+  // Add debug toggle prop with default value
+  debugMode = false,
+  setDebugMode = () => {}
 }) => {
   const [localApiKey, setLocalApiKey] = useState(customApiKey);
   
@@ -29,29 +32,69 @@ const ErrorModal = ({
               closeErrorModal();
             }
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              closeErrorModal();
+            }
+          }}
         >
-          <div className="bg-white p-6 rounded-xl shadow-medium max-w-md w-full mx-4 my-8">
+          <dialog 
+            open
+            className="bg-white p-6 rounded-xl shadow-medium max-w-md w-full mx-4 my-8 relative"
+            aria-labelledby="error-modal-title"
+          >
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-medium text-gray-800">API Quota Exceeded</h2>
-                <button 
-                  type="button"
-                  onClick={closeErrorModal}
-                  className="text-gray-500 hover:text-gray-700"
-                  aria-label="Close"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <h2 id="error-modal-title" className="text-xl font-medium text-gray-800">This space is super popular</h2>
+                <div className="flex items-center gap-2">
+                  {/* Debug toggle button - only visible in development */}
+                  {process.env.NODE_ENV === 'development' && (
+                    <div className="relative group">
+                      <button
+                        type="button"
+                        onClick={() => setDebugMode(!debugMode)}
+                        className={`flex items-center justify-center p-1.5 rounded transition-colors ${
+                          debugMode 
+                            ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                        }`}
+                        aria-label={debugMode ? "Debug mode on" : "Debug mode off"}
+                      >
+                        <Bug className="w-4 h-4" />
+                        <span className="ml-1 text-xs font-medium">{debugMode ? "ON" : "OFF"}</span>
+                      </button>
+                      
+                      {/* Tooltip */}
+                      <div className="absolute left-1/2 bottom-full mb-2 -translate-x-1/2 hidden group-hover:block w-48 p-2 bg-gray-800 text-xs text-white rounded shadow-lg z-10">
+                        <p className="text-center">
+                          Debug Mode: {debugMode ? "ON" : "OFF"}
+                        </p>
+                        <p className="mt-1">
+                          When enabled, this modal will automatically appear on page load for development purposes.
+                        </p>
+                        <div className="w-2 h-2 bg-gray-800 absolute left-1/2 -bottom-1 -ml-1 rotate-45" />
+                      </div>
+                    </div>
+                  )}
+                  <button 
+                    type="button"
+                    onClick={closeErrorModal}
+                    className="text-gray-500 hover:text-gray-700"
+                    aria-label="Close"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
               
               <div className="text-gray-600">
                 <p className="mb-2">
-                  You've exceeded your API quota. You can:
+                  Our free API key is currently at capacity. To continue:
                 </p>
-                <ul className="list-disc ml-5 mb-4 space-y-1 text-gray-600">
-                  <li>Wait for your quota to reset</li>
-                  <li>Use your own API key from <a href="https://ai.google.dev/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Google AI Studio</a></li>
-                </ul>
+                <ol className="list-decimal pl-5 space-y-2 mb-0">
+                  <li>Get your own API key at <a href="https://ai.dev/app/apikey" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline">ai.dev/app/apikey</a></li>
+                  <li>Enter it below</li>
+                </ol>
               </div>
               
               <form onSubmit={handleSubmit} className="space-y-3">
@@ -70,7 +113,6 @@ const ErrorModal = ({
                     onChange={(e) => setLocalApiKey(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Your API key will be saved locally and never sent to our servers.</p>
                 </div>
                 <div className="flex justify-end gap-3 pt-2">
                   <button
@@ -90,7 +132,7 @@ const ErrorModal = ({
                 </div>
               </form>
             </div>
-          </div>
+          </dialog>
         </div>
       )}
     </>

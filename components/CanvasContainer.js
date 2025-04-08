@@ -69,6 +69,7 @@ const CanvasContainer = () => {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [customApiKey, setCustomApiKey] = useState("");
+  const [debugMode, setDebugMode] = useState(false);
   const [styleMode, setStyleMode] = useState("material");
   const [strokeCount, setStrokeCount] = useState(0);
   const strokeTimeoutRef = useRef(null);
@@ -108,7 +109,36 @@ const CanvasContainer = () => {
       // Validate the API key silently
       validateApiKey(savedApiKey);
     }
+    
+    // Check if debug mode is enabled in localStorage or URL
+    const debugParam = new URLSearchParams(window.location.search).get('debug');
+    // Only look at localStorage if debug parameter is not explicitly set to false
+    const savedDebug = debugParam !== "false" && localStorage.getItem("debugMode") === "true";
+    
+    if (debugParam === "true" || savedDebug) {
+      // Set debug mode to true AND show error modal
+      setDebugMode(true);
+      setShowErrorModal(true);
+    } else {
+      // Ensure debug mode is OFF by default
+      setDebugMode(false);
+      // Also clean up any stale localStorage value
+      if (localStorage.getItem("debugMode") === "true") {
+        localStorage.setItem("debugMode", "false");
+      }
+    }
   }, []);
+
+  // Add effect to save debug mode to localStorage
+  useEffect(() => {
+    // Always save the current state to localStorage
+    localStorage.setItem("debugMode", debugMode.toString());
+    
+    // ONLY auto-show error modal when debug mode is enabled
+    if (debugMode === true) {
+      setShowErrorModal(true);
+    }
+  }, [debugMode]);
 
   // Add a function to validate the API key
   const validateApiKey = async (apiKey) => {
@@ -1608,6 +1638,8 @@ const CanvasContainer = () => {
         customApiKey={customApiKey}
         setCustomApiKey={setCustomApiKey}
         handleApiKeySubmit={handleApiKeySubmit}
+        debugMode={debugMode}
+        setDebugMode={setDebugMode}
       />
 
       <ApiKeyModal
