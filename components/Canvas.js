@@ -39,6 +39,8 @@ const Canvas = forwardRef(({
   styleMode,
   setStyleMode,
   isSendingToDoodle,
+  customApiKey,
+  onOpenApiKeyModal,
 }, ref) => {
   const [showBezierGuides, setShowBezierGuides] = useState(true);
   const [activePoint, setActivePoint] = useState(-1);
@@ -195,6 +197,7 @@ const Canvas = forwardRef(({
           },
           body: JSON.stringify({
             imageData: compressedImage.split(",")[1],
+            customApiKey,
           }),
         });
 
@@ -293,7 +296,7 @@ const Canvas = forwardRef(({
     };
 
     reader.readAsDataURL(file);
-  }, [canvasRef, currentTool, onDrawingChange, saveCanvasState, setCurrentTool]);
+  }, [canvasRef, currentTool, onDrawingChange, saveCanvasState, setCurrentTool, customApiKey]);
 
   // Keep the ref updated
   useEffect(() => {
@@ -1108,7 +1111,7 @@ const Canvas = forwardRef(({
           </div>
         )}
         
-        {/* Updated doodle conversion error overlay with dismiss button */}
+        {/* Updated doodle conversion error overlay with dismiss button and API key button */}
         {doodleError && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-400/80 rounded-xl z-50">
             <div className="bg-white shadow-lg rounded-xl p-6 flex flex-col items-center max-w-md">
@@ -1116,13 +1119,26 @@ const Canvas = forwardRef(({
               <p className="text-gray-900 font-medium text-lg">Failed to Convert Image</p>
               <p className="text-gray-700 text-center mt-2">{doodleError}</p>
               <p className="text-gray-500 text-sm mt-4">Try a different image or try again later</p>
-              <button 
-                type="button"
-                className="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
-                onClick={clearDoodleError}
-              >
-                Dismiss
-              </button>
+              
+              {/* Add buttons in a row */}
+              <div className="flex gap-3 mt-4">
+                <button 
+                  type="button"
+                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                  onClick={clearDoodleError}
+                >
+                  Dismiss
+                </button>
+                
+                {/* New API Key button that shows in grayscale */}
+                <button 
+                  type="button"
+                  className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                  onClick={onOpenApiKeyModal}
+                >
+                  Add API Key
+                </button>
+              </div>
             </div>
           </div>
         )}

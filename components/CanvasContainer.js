@@ -1605,6 +1605,8 @@ const CanvasContainer = () => {
                       styleMode={styleMode}
                       setStyleMode={setStyleMode}
                       isSendingToDoodle={isSendingToDoodle}
+                      customApiKey={customApiKey}
+                      onOpenApiKeyModal={() => setShowApiKeyModal(true)}
                     />
                   </div>
 
