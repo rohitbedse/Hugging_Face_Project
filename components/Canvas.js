@@ -1,4 +1,4 @@
-  import { useRef, useEffect, useState, forwardRef, useImperativeHandle, useCallback } from 'react';
+import { useRef, useEffect, useState, forwardRef, useImperativeHandle, useCallback } from 'react';
 import { 
   getCoordinates, 
   drawBezierCurve, 
@@ -7,7 +7,7 @@ import {
   isNearHandle,
   updateHandle
 } from './utils/canvasUtils';
-import { PencilLine, Upload, ImagePlus, LoaderCircle, Brush } from 'lucide-react';
+import { PencilLine, Upload, ImagePlus, LoaderCircle, Brush, AlertCircle } from 'lucide-react';
 import ToolBar from './ToolBar';
 import StyleSelector from './StyleSelector';
 
@@ -51,6 +51,7 @@ const Canvas = forwardRef(({
   const [shapeStartPos, setShapeStartPos] = useState(null);
   const [previewCanvas, setPreviewCanvas] = useState(null);
   const [isDoodleConverting, setIsDoodleConverting] = useState(false);
+  const [doodleError, setDoodleError] = useState(null);
   const [uploadedImages, setUploadedImages] = useState([]);
   const [draggingImage, setDraggingImage] = useState(null);
   const [resizingImage, setResizingImage] = useState(null);
@@ -155,6 +156,11 @@ const Canvas = forwardRef(({
   // Create a stable ref for handleFileChange to avoid dependency cycles
   const handleFileChangeRef = useRef(null);
   
+  // Add clearDoodleError function
+  const clearDoodleError = useCallback(() => {
+    setDoodleError(null);
+  }, []);
+  
   // Update handleFileChange function
   const handleFileChange = useCallback(async (event) => {
     const file = event.target.files?.[0];
@@ -167,6 +173,9 @@ const Canvas = forwardRef(({
     if (typeof onDrawingChange === 'function') {
       onDrawingChange(true);
     }
+    
+    // Clear previous errors
+    setDoodleError(null);
     
     // Show loading state
     setIsDoodleConverting(true);
@@ -189,49 +198,94 @@ const Canvas = forwardRef(({
           }),
         });
 
+        // Get response data
         const data = await response.json();
         
-        if (data.success && data.imageData) {
-          const img = new Image();
-          img.onload = () => {
-            const ctx = canvasRef.current.getContext('2d');
-            
-            // Clear canvas
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-            
-            // Calculate dimensions
-            const scale = Math.min(
-              canvasRef.current.width / img.width,
-              canvasRef.current.height / img.height
-            );
-            const x = (canvasRef.current.width - img.width * scale) / 2;
-            const y = (canvasRef.current.height - img.height * scale) / 2;
-            
-            // Draw doodle
-            ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-            
-            // Save canvas state
-            saveCanvasState();
-            
-            // Hide loading state
-            setIsDoodleConverting(false);
-
-            // Ensure placeholder is hidden
-            if (typeof onDrawingChange === 'function') {
-              onDrawingChange(true);
-            }
-
-            // Automatically trigger generation
-            handleGenerationRef.current();
-          };
+        // Check for API errors (non-200 status)
+        if (!response.ok) {
+          let errorMessage = data.error || `Server error (${response.status})`;
           
-          img.src = `data:image/png;base64,${data.imageData}`;
+          // Check if the response contains details about retry attempts
+          if (data.retries !== undefined) {
+            errorMessage += `. Failed after ${data.retries + 1} attempts.`;
+          }
+          
+          // Check for specific error types from the server
+          if (errorMessage.includes('overloaded') || errorMessage.includes('503')) {
+            errorMessage = "The model is overloaded. Please try again later.";
+          } else if (errorMessage.includes('quota') || errorMessage.includes('API key')) {
+            errorMessage = "API quota exceeded or invalid API key.";
+          }
+          
+          throw new Error(errorMessage);
         }
+        
+        // Check for API response with success: false
+        if (!data.success) {
+          let errorMessage = data.error || "Failed to convert image to doodle";
+          
+          // Check if the response contains details about retry attempts
+          if (data.retries !== undefined) {
+            errorMessage += `. Failed after ${data.retries + 1} attempts.`;
+          }
+          
+          throw new Error(errorMessage);
+        }
+        
+        // Check if we have image data
+        if (!data.imageData) {
+          throw new Error("No image data received from the server");
+        }
+        
+        // Process successful response
+        const img = new Image();
+        img.onload = () => {
+          const ctx = canvasRef.current.getContext('2d');
+          
+          // Clear canvas
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+          
+          // Calculate dimensions
+          const scale = Math.min(
+            canvasRef.current.width / img.width,
+            canvasRef.current.height / img.height
+          );
+          const x = (canvasRef.current.width - img.width * scale) / 2;
+          const y = (canvasRef.current.height - img.height * scale) / 2;
+          
+          // Draw doodle
+          ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+          
+          // Save canvas state
+          saveCanvasState();
+          
+          // Hide loading state
+          setIsDoodleConverting(false);
+
+          // Ensure placeholder is hidden
+          if (typeof onDrawingChange === 'function') {
+            onDrawingChange(true);
+          }
+
+          // Automatically trigger generation
+          handleGenerationRef.current();
+        };
+        
+        img.src = `data:image/png;base64,${data.imageData}`;
       } catch (error) {
         console.error('Error processing image:', error);
+        
+        // Set error state with message
+        setDoodleError(error.message || "Failed to convert image. Please try again.");
+        
+        // Schedule error message to disappear after 5 seconds (was 3 seconds)
+        setTimeout(() => {
+          setDoodleError(null);
+        }, 5000);
+        
+        // Hide loading state
         setIsDoodleConverting(false);
-        alert('Error processing image. Please try a different image or a smaller file size.');
         
         // Restore previous tool even if there's an error
         setCurrentTool(previousTool);
@@ -239,7 +293,7 @@ const Canvas = forwardRef(({
     };
 
     reader.readAsDataURL(file);
-  }, [canvasRef, currentTool, onDrawingChange, saveCanvasState, setCurrentTool, setIsDoodleConverting]);
+  }, [canvasRef, currentTool, onDrawingChange, saveCanvasState, setCurrentTool]);
 
   // Keep the ref updated
   useEffect(() => {
@@ -1044,12 +1098,31 @@ const Canvas = forwardRef(({
         </button>
         
         {/* Doodle conversion loading overlay */}
-        {isDoodleConverting && (
+        {isDoodleConverting && !doodleError && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-400/80 rounded-xl z-50">
             <div className="bg-white shadow-lg rounded-xl p-6 flex flex-col items-center">
               <LoaderCircle className="w-12 h-12 text-gray-700 animate-spin mb-4" />
               <p className="text-gray-900 font-medium text-lg">Converting to doodle...</p>
               <p className="text-gray-500 text-sm mt-2">This may take a moment</p>
+            </div>
+          </div>
+        )}
+        
+        {/* Updated doodle conversion error overlay with dismiss button */}
+        {doodleError && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-400/80 rounded-xl z-50">
+            <div className="bg-white shadow-lg rounded-xl p-6 flex flex-col items-center max-w-md">
+              <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+              <p className="text-gray-900 font-medium text-lg">Failed to Convert Image</p>
+              <p className="text-gray-700 text-center mt-2">{doodleError}</p>
+              <p className="text-gray-500 text-sm mt-4">Try a different image or try again later</p>
+              <button 
+                type="button"
+                className="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                onClick={clearDoodleError}
+              >
+                Dismiss
+              </button>
             </div>
           </div>
         )}

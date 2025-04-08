@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from 'next/server';
 
 // Configuration for the API route
@@ -35,7 +35,8 @@ export default async function handler(req, res) {
     // Set up the API key
     const apiKey = customApiKey || process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return res.status(500).json({ error: 'API key is required' });
+      console.error('Missing Gemini API key');
+      return res.status(500).json({ error: 'API key is not configured' });
     }
 
     // Retry loop for handling transient errors
@@ -44,6 +45,8 @@ export default async function handler(req, res) {
         console.log(`Initializing Gemini AI for doodle conversion (attempt ${retryCount + 1}/${MAX_RETRIES + 1})`);
         // Initialize the Gemini API
         const genAI = new GoogleGenerativeAI(apiKey);
+        
+        console.log('Configuring Gemini model');
         const model = genAI.getGenerativeModel({
           model: "gemini-2.0-flash-exp-image-generation",
           generationConfig: {
@@ -71,6 +74,7 @@ Requirements:
   * Text should remain readable in the final doodle, and true to the original :))`;
 
         // Prepare the generation content
+        console.log('Including image data in generation request');
         const generationContent = [
           {
             inlineData: {
@@ -84,8 +88,9 @@ Requirements:
         // Generate content
         console.log(`Calling Gemini API for doodle conversion (attempt ${retryCount + 1}/${MAX_RETRIES + 1})...`);
         const result = await model.generateContent(generationContent);
+        console.log('Gemini API response received');
+        
         const response = await result.response;
-        console.log('Gemini API response received for doodle conversion');
         
         // Process the response to extract image data
         let convertedImageData = null;
@@ -97,14 +102,14 @@ Requirements:
         for (const part of response.candidates[0].content.parts) {
           if (part.inlineData) {
             convertedImageData = part.inlineData.data;
-            console.log('Found image data in doodle conversion response');
+            console.log('Found image data in response');
             break;
           }
         }
 
         if (!convertedImageData) {
           console.error('No image data in response parts:', response.candidates[0].content.parts);
-          throw new Error('No image data received from the API');
+          throw new Error('No image data found in response parts');
         }
 
         // Return the converted image data
@@ -128,7 +133,7 @@ Requirements:
           
         // Check if we should retry
         if (retryCount < MAX_RETRIES && isRetryableError) {
-          console.log(`Retryable error encountered in doodle conversion (${retryCount + 1}/${MAX_RETRIES}):`, attemptError.message);
+          console.log(`Retryable error encountered (${retryCount + 1}/${MAX_RETRIES}):`, attemptError.message);
           retryCount++;
           // Wait before retrying
           await wait(RETRY_DELAY * retryCount);
@@ -140,7 +145,7 @@ Requirements:
       }
     }
   } catch (error) {
-    console.error("Error during doodle conversion:", error);
+    console.error('Error in /api/convert-to-doodle:', error);
     
     // Check for specific error types
     if (error.message?.includes('quota') || error.message?.includes('Resource has been exhausted')) {
@@ -161,10 +166,8 @@ Requirements:
       });
     }
     
-    const errorMessage = error.message || "An unknown error occurred during conversion.";
-    return res.status(500).json({ 
-      success: false, 
-      error: errorMessage,
+    return res.status(500).json({
+      error: error.message || 'An error occurred during conversion.',
       details: error.stack,
       retries: retryCount
     });
