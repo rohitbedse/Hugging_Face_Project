@@ -8,7 +8,7 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>Chrome Sketch Generator</title>
+        <title>Sketch Generator</title>
         <meta name="description" content="Turn your sketches into chrome sculptures" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
