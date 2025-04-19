@@ -9,8 +9,6 @@ const Header = () => {
             <span>By</span>{" "}
             <a href="https://x.com/dev_valladares" target="_blank" rel="noreferrer" className="hover:text-gray-600 underline transition-colors">rohitbedse_</a> 
             {" "}&{" "}
-            <a href="https://x.com/trudypainter" target="_blank" rel="noreferrer" className="hover:text-gray-600 underline transition-colors">Trudy Painter</a>
-            {" "}
 
             
           </p>
