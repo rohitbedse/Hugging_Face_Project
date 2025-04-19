@@ -7,7 +7,7 @@ const Header = () => {
           style={{ fontFamily: "'Google Sans', sans-serif" }}>GEMINI 3D DRAWING</h1>
           <p className="text-sm text-gray-400">
             <span>By</span>{" "}
-            <a href="https://x.com/dev_valladares" target="_blank" rel="noreferrer" className="hover:text-gray-600 underline transition-colors">Dev Valladares</a> 
+            <a href="https://x.com/dev_valladares" target="_blank" rel="noreferrer" className="hover:text-gray-600 underline transition-colors">rohitbedse_</a> 
             {" "}&{" "}
             <a href="https://x.com/trudypainter" target="_blank" rel="noreferrer" className="hover:text-gray-600 underline transition-colors">Trudy Painter</a>
             {" "}
